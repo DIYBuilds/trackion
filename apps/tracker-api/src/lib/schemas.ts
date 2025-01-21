@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum EventType {
   PageView = 'pageview',
@@ -10,6 +11,7 @@ export enum EventType {
 }
 
 export const EventDataSchema = z.object({
+  eventId: z.string().default(() => uuidv4()),
   eventType: z.string(),
   page: z.string(),
   referrer: z.string(),
