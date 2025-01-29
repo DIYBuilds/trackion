@@ -1,4 +1,5 @@
-import { Calendar, Home, Inbox, Search, Settings } from 'lucide-react';
+'use client';
+import { ChartBarStackedIcon, PlusIcon } from 'lucide-react';
 
 import {
   Sidebar,
@@ -6,69 +7,70 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { ThemeToggle } from './ui/theme-toggle';
-import UserNav from './comman/user-nav';
+import { useAddPropertyModal } from '@/store/modal-store';
+import { cn } from '@/lib/utils';
 
-// Menu items.
-const items = [
-  {
-    title: 'Home',
-    url: '#',
-    icon: Home,
-  },
-  {
-    title: 'Inbox',
-    url: '#',
-    icon: Inbox,
-  },
-  {
-    title: 'Calendar',
-    url: '#',
-    icon: Calendar,
-  },
-  {
-    title: 'Search',
-    url: '#',
-    icon: Search,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
-  },
-];
+export function AppSidebar({
+  footer,
+}: Readonly<{
+  footer?: React.ReactNode;
+}>) {
+  const addPropertyStore = useAddPropertyModal();
 
-export function AppSidebar() {
+  const menu: SideBarMenuList = {
+    '1': [
+      {
+        name: 'Add Property',
+        icon: <PlusIcon className="h-5 w-5" />,
+        onClick: () => addPropertyStore.onOpen(),
+      },
+    ],
+  };
+
   return (
-    <Sidebar>
-      <SidebarContent className="flex ">
-        <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
+    <Sidebar className="border-r-2 border-border">
+      <SidebarContent>
+        <SidebarHeader className="flex items-center gap-2 flex-row p-4 bg-primary border-b-2 border-primary">
+          <div className="flex items-center justify-center w-8 h-8 bg-background rounded-none border-2 border-border shadow-pixel">
+            <ChartBarStackedIcon className="h-5 w-5 text-primary" />
+          </div>
+          <span className="text-lg font-pixel text-primary-foreground">
+            Trackion Studio
+          </span>
+        </SidebarHeader>
+        {Object.keys(menu).map((key) => (
+          <SidebarGroup key={key}>
+            <SidebarGroupContent className="p-2">
+              {menu[key].map(({ name, icon, onClick }, idx) => (
+                <SidebarMenuItem
+                  key={idx}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 text-sm font-pixel',
+                    'border-2 border-border bg-background shadow-pixel',
+                    'hover:translate-y-[2px] hover:shadow-pixel-sm',
+                    'active:translate-y-[4px] active:shadow-none',
+                    'transition-all duration-150 cursor-pointer',
+                    'text-foreground',
+                  )}
+                  onClick={onClick}
+                >
+                  {icon}
+                  {name}
                 </SidebarMenuItem>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem className="flex border-t border-muted justify-between items-center">
-            <UserNav />
+          <SidebarMenuItem className="flex border-t-2 border-border justify-between items-center p-4 bg-muted">
+            {footer}
             <ThemeToggle />
           </SidebarMenuItem>
         </SidebarMenu>

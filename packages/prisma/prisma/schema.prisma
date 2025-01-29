@@ -15,38 +15,38 @@ datasource db {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  name        String
-  email       String       @unique
-  image       String
-  accountId   String       @unique
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  memberships Membership[]
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  image     String
+  accountId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties     Property[]
+  eventTemplates EventTemplate[]
 
   @@index([accountId, id, email])
 }
 
 model Property {
-  id      String       @id @default(uuid())
-  domain  String       @unique
-  members Membership[]
+  id             String          @id @default(uuid())
+  domain         String          @unique
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventTemplates EventTemplate[]
 
   @@index([domain])
 }
 
-model Membership {
-  id         String     @id @default(uuid())
-  member     User       @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  propertyId String
-  memberId   String
-  role       MemberRole
-}
-
-enum MemberRole {
-  owner
-  admin
-  viewer
-  editor
+model EventTemplate {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  userId      String
+  schema      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties  Property[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }

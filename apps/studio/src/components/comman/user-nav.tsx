@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenuButton } from '../ui/sidebar';
 import { SignOutButton } from '@clerk/nextjs';
+
 export default async function UserNav() {
   const { data: user, status } = await getUserProfile();
 
