@@ -23,8 +23,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  properties     Property[]
-  eventTemplates EventTemplate[]
+  properties Property[]
 
   @@index([accountId, id, email])
 }
@@ -36,17 +35,33 @@ model Property {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   eventTemplates EventTemplate[]
 
+  dataSources DataSource[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
   @@index([domain])
 }
 
 model EventTemplate {
-  id          String     @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
+  identifier  String
   description String?
-  userId      String
   schema      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  properties  Property[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model DataSource {
+  id          String   @id @default(uuid())
+  name        String
+  type        String
+  config      String
+  description String?
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

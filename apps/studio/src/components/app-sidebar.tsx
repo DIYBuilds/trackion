@@ -1,5 +1,5 @@
 'use client';
-import { ChartBarStackedIcon, PlusIcon } from 'lucide-react';
+import { ChartBarStackedIcon, Home, PlusIcon } from 'lucide-react';
 
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 import { ThemeToggle } from './ui/theme-toggle';
 import { useAddPropertyModal } from '@/store/modal-store';
 import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export function AppSidebar({
   footer,
@@ -21,9 +22,15 @@ export function AppSidebar({
   footer?: React.ReactNode;
 }>) {
   const addPropertyStore = useAddPropertyModal();
+  const router = useRouter();
 
   const menu: SideBarMenuList = {
     '1': [
+      {
+        name: 'Home',
+        icon: <Home className="h-5 w-5" />,
+        onClick: () => router.push('/app'),
+      },
       {
         name: 'Add Property',
         icon: <PlusIcon className="h-5 w-5" />,

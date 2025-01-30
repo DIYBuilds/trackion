@@ -25,16 +25,20 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Loader2 } from 'lucide-react';
 import { useAddPropertyModal } from '@/store/modal-store';
+import toast from 'react-hot-toast';
 
 const formSchema = z.object({
-  domain: z.string().refine((v) => v.length > 0, {
-    message: 'Domain is required',
-  }),
+  domain: z
+    .string()
+    .regex(
+      /^(?!:\/\/)([a-zA-Z0-9-_]+\.)+[a-zA-Z]{2,}$/,
+      'Invalid domain. Example: example.com',
+    ),
 });
 
 export default function AddPropertyModel() {
-  const modal = useAddPropertyModal();
   const [loading, setLoading] = useState(false); // Loading state for request
+  const modal = useAddPropertyModal();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,14 +48,34 @@ export default function AddPropertyModel() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setLoading(true);
+
+      const res = await fetch('/api/property', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await res.json();
+      if (res.status !== 200) {
+        toast.error(data.error);
+        return;
+      }
+
+      toast.success('Property added successfully');
+      modal.onClose();
     } catch (error: any) {
+      console.error('Failed to add property:', error);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <AlertDialog open={modal.isOpen} onOpenChange={() => modal.onClose()}>
+    <AlertDialog open={modal.isOpen} onOpenChange={modal.onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-xl font-bold mb-4">
@@ -66,13 +90,12 @@ export default function AddPropertyModel() {
           >
             <FormField
               control={form.control}
-              disabled={loading}
               name="domain"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Domain</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={loading} />
                   </FormControl>
                   <FormMessage />
                   <FormDescription>
@@ -84,7 +107,7 @@ export default function AddPropertyModel() {
             />
 
             <Button className="w-full" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" /> : 'Add Site'}
+              {loading ? <Loader2 className="animate-spin" /> : 'Add Property'}
             </Button>
           </form>
         </Form>
